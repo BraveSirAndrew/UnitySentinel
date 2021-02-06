@@ -5,7 +5,7 @@ using static SentinelLog;
 
 public class TestRunnerCallbacks : ICallbacks
 {
-	private class Colors
+	public class Colors
 	{
 		public static string Black = "\u001b[30m";
 		public static string Red = "\u001b[31m";
@@ -35,28 +35,32 @@ public class TestRunnerCallbacks : ICallbacks
 	};
 
 
+	public void RunStarted(ITestAdaptor testsToRun)
+	{
+		Log($"Running tests...");
+	}
+
 	public void RunFinished(ITestResultAdaptor result)
 	{
 		var resultState = result.ResultState.Replace("(Child)", "");
-		Log($"Test Run Summary");
-		Log($"================");
+		Log($"");
+		Log($"{Colorize("Test Run Summary", Colors.Yellow)}");
+		Log($"{Colorize("================================", Colors.Yellow)}");
 		Log("");
 
 		// failed items next so they are more visible
-		_results.Where(x => IsFailed(x)).ToList().ForEach(r =>
+		_results.Where(IsFailed).ToList().ForEach(r =>
 		{
 			OutputResult(r);
 			Log("");
 		});
 
 		Log(Colorize(new string('=', 60), GetResultColor(resultState)));
-		Log($"Test Run Finished {result.FailCount} Failed, {result.SkipCount} Skipped, {result.PassCount} Passed");
+		Log($"Test Run Finished " +
+		    $"{Colorize(result.FailCount.ToString(), Colors.Yellow)} Failed, " +
+		    $"{Colorize(result.SkipCount.ToString(), Colors.Yellow)} Skipped, " +
+		    $"{Colorize(result.PassCount.ToString(), Colors.Yellow)} Passed");
 		Log(Colorize(new string('=', 60), GetResultColor(resultState)));
-	}
-
-	public void RunStarted(ITestAdaptor testsToRun)
-	{
-		Log($"Running {testsToRun.TestCaseCount} tests");
 	}
 
 	public void TestFinished(ITestResultAdaptor result)
@@ -99,7 +103,7 @@ public class TestRunnerCallbacks : ICallbacks
 			Log("");
 		}
 	}
-
+	
 	private string GetResultColor(string resultState)
 	{
 		return _resultStateColors.TryGetValue(resultState, out var value) ? value : Colors.Reset;

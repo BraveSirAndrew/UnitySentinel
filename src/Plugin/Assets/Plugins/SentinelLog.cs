@@ -6,4 +6,6 @@ public static class SentinelLog
 	{
 		Debug.Log($"SENTINEL >>>>>>>>>> {msg}");
 	}
+
+	public static string Colorize(string s, string color) => $"{color}{s}{TestRunnerCallbacks.Colors.Reset}";
 }

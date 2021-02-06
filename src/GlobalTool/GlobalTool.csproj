@@ -6,7 +6,24 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="SentinelPlugin.dll" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="SentinelPlugin.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="CommandLineParser" Version="2.8.0" />
+    <PackageReference Include="Spectre.Console" Version="0.37.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="doom.flf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

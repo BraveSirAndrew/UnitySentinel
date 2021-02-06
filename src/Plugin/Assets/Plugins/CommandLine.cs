@@ -14,9 +14,23 @@ public static class CommandLine
 		return args.Contains(name);
 	}
 
+	public static bool TryGetArgumentValue(string name, out string value)
+	{
+		value = GetArgumentValue(name, Environment.GetCommandLineArgs());
+		return value != null;
+	}
+
 	public static string GetArgumentValue(string name)
 	{
 		return GetArgumentValue(name, Environment.GetCommandLineArgs());
+	}
+
+	public static string[] GetSeperatedListValue(string name, string seperator = ";")
+	{
+		if (TryGetArgumentValue(name, out var values) == false)
+			return null;
+
+		return values.Split(new[] {seperator}, StringSplitOptions.RemoveEmptyEntries);
 	}
 
 	public static string GetArgumentValue(string name, ICollection<string> args)
