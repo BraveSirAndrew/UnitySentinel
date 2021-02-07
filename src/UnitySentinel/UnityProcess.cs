@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 
-namespace Sentinel
+namespace UnitySentinel
 {
 	public class UnityProcess : IDisposable
 	{
@@ -62,11 +62,6 @@ namespace Sentinel
 			};
 		}
 
-		private string GetCustomArg(string arg, string value)
-		{
-			return string.IsNullOrEmpty(value) ? "" : $"-{arg} {value}";
-		}
-
 		public UnityProcessStatus Status { get; private set; }
 		public string ProjectPath { get; }
 		public ChannelReader<string> Output => _consoleOutputChannel.Reader;
@@ -86,6 +81,11 @@ namespace Sentinel
 		{
 			_process?.Kill(true);
 			_process?.Dispose();
+		}
+
+		private string GetCustomArg(string arg, string value)
+		{
+			return string.IsNullOrEmpty(value) ? "" : $"-{arg} {value}";
 		}
 	}
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using CommandLine;
 using Spectre.Console;
 
-namespace Sentinel
+namespace UnitySentinel
 {
 	static class Program
 	{
@@ -32,14 +32,19 @@ namespace Sentinel
 
 			await Parser.Default.ParseArguments<Options>(args).MapResult(async o =>
 			{
-				_unityProcess = new UnityProcess(ParseUnityPathFromProject(o.ProjectPath) ?? o.UnityPath,
-					o.ProjectPath ?? Environment.CurrentDirectory, o.AssemblyNames, o.TestNames, o.TestCategories, o.WatchPaths, o.TestMode);
+				var projectPath = o.ProjectPath ?? Environment.CurrentDirectory;
+				_unityProcess = new UnityProcess(ParseUnityPathFromProject(projectPath) ?? o.UnityPath,
+					projectPath, o.AssemblyNames, o.TestNames, o.TestCategories, o.WatchPaths, o.TestMode);
 
-				AnsiConsole.Render(new FigletText(FigletFont.Load("doom.flf"), "Sentinel"));
+				using Stream figletStream = Assembly.GetExecutingAssembly().GetManifestResourceStream("UnitySentinel.figletfont.flf");
+				if (figletStream == null)
+					AnsiConsole.MarkupLine($"[green]Unity Senintel[/]");
+				else
+					AnsiConsole.Render(new FigletText(FigletFont.Load(figletStream), "Unity Sentinel"));
 
 				try
 				{
-					CopySentinelFiles(o.ProjectPath);
+					CopySentinelFiles(projectPath);
 					await StartUnity();
 					AnsiConsole.MarkupLine($"\n[green]Unity startup completed. Monitoring for changes...Ctrl-C to quit[/]");
 					await MonitorChanges();
@@ -48,7 +53,7 @@ namespace Sentinel
 				}
 				finally
 				{
-					CleanUp(o.ProjectPath);
+					CleanUp(projectPath);
 				}
 			}, _ => Task.FromResult(1));
 		}
@@ -121,7 +126,7 @@ namespace Sentinel
 
 		private static string GetSentinelSrcPath()
 		{
-			return Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "SentinelPlugin.dll");
+			return Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Content", "SentinelPlugin.dll");
 		}
 
 		private static string ParseUnityPathFromProject(string projectPath)

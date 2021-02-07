@@ -78,3 +78,4 @@ bld/
 [Ll]ogs/
 src/Plugin/SentinelPlugin.csproj
 src/Plugin/Plugin.sln
+*.nupkg

@@ -3,14 +3,21 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net5.0</TargetFramework>
+	  <PackAsTool>true</PackAsTool>
+	  <ToolCommandName>UnitySentinel</ToolCommandName>
+	  <PackageOutputPath>./nupkg</PackageOutputPath>
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="figletfont.flf" />
     <None Remove="SentinelPlugin.dll" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="SentinelPlugin.dll">
+    <EmbeddedResource Include="figletfont.flf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <Content Include="Content\SentinelPlugin.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
@@ -18,12 +25,6 @@
   <ItemGroup>
     <PackageReference Include="CommandLineParser" Version="2.8.0" />
     <PackageReference Include="Spectre.Console" Version="0.37.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="doom.flf">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 
 </Project>

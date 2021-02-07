@@ -1,4 +1,4 @@
-﻿namespace Sentinel
+﻿namespace UnitySentinel
 {
 	public enum UnityProcessStatus
 	{

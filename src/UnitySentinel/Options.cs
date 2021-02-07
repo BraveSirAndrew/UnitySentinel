@@ -1,16 +1,17 @@
 ﻿using CommandLine;
 
-namespace Sentinel
+namespace UnitySentinel
 {
 	public class Options
 	{
-		[Option("unitypath", Required = false, HelpText = "The path to the Unity executable you want to run")]
+		[Option("unitypath", Required = false, HelpText = "The path to the Unity editor executable. The tool will try to find the executable automatically " +
+		                                                  "in the default install location based on the last Unity version the project was opened with.")]
 		public string UnityPath { get; set; }
 
-		[Option("projectpath", Required = false, HelpText = "The path to the Unity project")]
+		[Option("projectpath", Required = false, HelpText = "The path to the Unity project. If you are executing the tool in the project directory, you don't need to specify this.")]
 		public string ProjectPath { get; set; }
 
-		[Option("testmode", Required = false, Default = "PlayMode", HelpText = "Run play-mode or edit-mode tests. Specify as PlayMode or EditMode. Default if not specified is PlayMode.")]
+		[Option("testmode", Required = false, Default = "PlayMode", HelpText = "Run play-mode or edit-mode tests. Specify as PlayMode or EditMode.")]
 		public string TestMode { get; set; }
 
 		[Option("watchpaths", Required = false, HelpText = "Specify additional paths outside of the project Asset folder to watch for changes, separated by a semi-colon.")]
