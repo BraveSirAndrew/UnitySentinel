@@ -5,12 +5,16 @@ VisualStudioVersion = 16.0.30804.86
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitySentinel", "src\UnitySentinel\UnitySentinel.csproj", "{0D138FBC-F135-4186-9BB4-35CB487D4C67}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "_build", "build\_build.csproj", "{7A703BB6-790C-4813-9838-74728C9FF73E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7A703BB6-790C-4813-9838-74728C9FF73E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7A703BB6-790C-4813-9838-74728C9FF73E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0D138FBC-F135-4186-9BB4-35CB487D4C67}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0D138FBC-F135-4186-9BB4-35CB487D4C67}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0D138FBC-F135-4186-9BB4-35CB487D4C67}.Release|Any CPU.ActiveCfg = Release|Any CPU
