@@ -16,10 +16,13 @@ namespace UnitySentinel
 		{
 			AppDomain.CurrentDomain.ProcessExit += (_, _) =>
 			{
-				Console.WriteLine($"Killing Unity process...");
-
 				var projectPath = _unityProcess?.ProjectPath;
-				_unityProcess?.Dispose();
+
+				if (_unityProcess != null && _unityProcess.IsRunning())
+				{
+					Console.WriteLine($"Killing Unity process...");
+					_unityProcess?.Dispose();
+				}
 
 				CleanUp(projectPath);
 			};
@@ -30,18 +33,26 @@ namespace UnitySentinel
 				Environment.Exit(0);
 			};
 
+			using (var figletStream = Assembly.GetExecutingAssembly().GetManifestResourceStream("UnitySentinel.figletfont.flf"))
+			{
+				if (figletStream == null)
+					AnsiConsole.MarkupLine($"[green]Unity Sentinel[/]");
+				else
+					AnsiConsole.Render(new FigletText(FigletFont.Load(figletStream), "Unity Sentinel"));
+			}
+
 			await Parser.Default.ParseArguments<Options>(args).MapResult(async o =>
 			{
 				var projectPath = o.ProjectPath ?? Environment.CurrentDirectory;
-				_unityProcess = new UnityProcess(ParseUnityPathFromProject(projectPath) ?? o.UnityPath,
-					projectPath, o.AssemblyNames, o.TestNames, o.TestCategories, o.WatchPaths, o.TestMode);
+				var unityExecutablePath = o.UnityPath ?? ParseUnityPathFromProject(projectPath);
+				if (File.Exists(unityExecutablePath) == false)
+				{
+					AnsiConsole.MarkupLine($"[red]Couldn't find Unity editor executable. Use the [bold]--unitypath[/] argument to specify it. Exiting.[/]");
+					return;
+				}
 
-				using Stream figletStream = Assembly.GetExecutingAssembly().GetManifestResourceStream("UnitySentinel.figletfont.flf");
-				if (figletStream == null)
-					AnsiConsole.MarkupLine($"[green]Unity Senintel[/]");
-				else
-					AnsiConsole.Render(new FigletText(FigletFont.Load(figletStream), "Unity Sentinel"));
-
+				_unityProcess = new UnityProcess(unityExecutablePath, projectPath, o.AssemblyNames, o.TestNames, o.TestCategories, o.WatchPaths, o.TestMode);
+				
 				try
 				{
 					CopySentinelFiles(projectPath);
@@ -91,13 +102,15 @@ namespace UnitySentinel
 
 		private static void CleanUp(string projectPath)
 		{
-			Console.WriteLine("Deleting Sentinel...");
 			var sentinelTargetPath = GetSentinelTargetPath(projectPath);
 			if (File.Exists(sentinelTargetPath))
+			{
+				Console.WriteLine("Deleting Sentinel...");
 				File.Delete(sentinelTargetPath);
 
-			if (File.Exists(sentinelTargetPath + ".meta"))
-				File.Delete(sentinelTargetPath + ".meta");
+				if (File.Exists(sentinelTargetPath + ".meta"))
+					File.Delete(sentinelTargetPath + ".meta");
+			}
 		}
 
 		private static void CopySentinelFiles(string projectPath)
@@ -132,25 +145,21 @@ namespace UnitySentinel
 		private static string ParseUnityPathFromProject(string projectPath)
 		{
 			if (string.IsNullOrEmpty(projectPath))
-				return null;
+				return string.Empty;
 
 			var projectSettingsPath = Path.Combine(projectPath, "ProjectSettings", "ProjectVersion.txt");
 			if (File.Exists(projectSettingsPath) == false)
-			{
-				AnsiConsole.MarkupLine($"[red]Couldn't find ProjectVersion.txt at '{projectSettingsPath}'. Without this file, you will need to " +
-				                       $"use the [bold]--unitypath[/] switch to specify the path to the Unity editor executable manually.[/]");
-				return null;
-			}
+				return string.Empty;
 
 			var projectVersionText = File.ReadAllText(projectSettingsPath);
 			var version = Regex.Match(projectVersionText, @"20\d{2}\.\d\.\w{3,4}|3").Value;
-			
+
 			var unityPath = Path.Combine(@"C:\Program Files\Unity\Hub\Editor", version, "Editor", "Unity.exe");
-			if(File.Exists(unityPath) == false)
+			if (File.Exists(unityPath) == false)
 			{
-				AnsiConsole.MarkupLine($"[red]Couldn't find the Unity executable at '{unityPath}'. Please specify the Unity path manually " +
-				                       $"using the [bold]--unitypath[/] switch.[/]");
-				return null;
+				AnsiConsole.MarkupLine($"[red]Couldn't find the Unity executable at '{unityPath}'. Please specify the Unity executable path manually " +
+									   $"using the [bold]--unitypath[/] switch.[/]");
+				return string.Empty;
 			}
 
 			return unityPath;

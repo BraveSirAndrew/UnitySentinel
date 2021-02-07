@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 using System.Threading.Channels;
 using System.Threading.Tasks;
+using Spectre.Console;
 
 namespace UnitySentinel
 {
@@ -12,10 +14,17 @@ namespace UnitySentinel
 
 		private Process _process;
 		private Channel<string> _consoleOutputChannel;
+		private bool _wasStarted;
 
 		public UnityProcess(string unityExecutablePath, string projectPath, string assemblyNames,
 			string testNames, string testCategories, string watchPaths, string testMode)
 		{
+			if (File.Exists(unityExecutablePath) == false)
+			{
+				AnsiConsole.MarkupLine($"[red][/]");
+				return;
+			}
+
 			ProjectPath = projectPath;
 			Status = UnityProcessStatus.StartingUp;
 
@@ -70,6 +79,7 @@ namespace UnitySentinel
 		{
 			_process.Start();
 			_process.BeginOutputReadLine();
+			_wasStarted = true;
 		}
 
 		public async Task WaitForExit()
@@ -86,6 +96,11 @@ namespace UnitySentinel
 		private string GetCustomArg(string arg, string value)
 		{
 			return string.IsNullOrEmpty(value) ? "" : $"-{arg} {value}";
+		}
+
+		public bool IsRunning()
+		{
+			return _wasStarted && _process.HasExited == false;
 		}
 	}
 }
